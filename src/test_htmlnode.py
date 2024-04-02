@@ -1,7 +1,8 @@
 import unittest
 from htmlnode import (
     HTMLNode,
-    LeafNode
+    LeafNode,
+    ParentNode
 )
 
 
@@ -27,6 +28,35 @@ class TestHTMLLeaf(unittest.TestCase):
         leaf = LeafNode("a",None)
         with self.assertRaises(ValueError):
             leaf.to_html()
+
+class TestHTMLParent(unittest.TestCase):
+    def test_single_parent_to_hml(self):
+        parent = ParentNode(
+            "p",
+            [
+                LeafNode("b", "Bold text"),
+                LeafNode(None, "Normal text"),
+                LeafNode("i", "italic text"),
+                LeafNode(None, "Normal text"),
+            ],
+        )   
+        self.assertEqual(parent.to_html(),"<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>")
+    def test_multi_parent_to_html(self):
+        parent = ParentNode(
+            "p",
+            [
+                LeafNode(None, "Normal text"),
+                ParentNode(
+                    "b", 
+                    [
+                        LeafNode(None,"Bold text"),
+                        LeafNode("i", "Italic text")
+                    ]
+                )
+                
+            ],
+        )
+        self.assertEqual(parent.to_html(),"<p>Normal text<b>Bold text<i>Italic text</i></b></p>")
 
 if __name__ == "__main__":
     unittest.main()
