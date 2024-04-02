@@ -1,3 +1,6 @@
+from textnode import TextNode
+
 def main():
-    print("hello world")
+    text = TextNode("Test from outter world","bold","emasphere.com")
+    print(text)
 main()
