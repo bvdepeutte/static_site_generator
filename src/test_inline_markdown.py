@@ -1,11 +1,11 @@
 import unittest
 from inline_markdown import (
     split_nodes_delimiter,
-    extract_markdown_images,
-    extract_markdown_links,
-    split_nodes_link,
     split_nodes_image,
-    text_to_textnodes
+    split_nodes_link,
+    text_to_textnodes,
+    extract_markdown_links,
+    extract_markdown_images,
 )
 
 from textnode import (
@@ -15,7 +15,7 @@ from textnode import (
     text_type_italic,
     text_type_code,
     text_type_image,
-    text_type_link
+    text_type_link,
 )
 
 
@@ -86,23 +86,50 @@ class TestInlineMarkdown(unittest.TestCase):
             new_nodes,
         )
 
-    def test_extract_markdown_img(self):
-        pattern = "This is text with an ![image](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png) and ![another](https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png)"
-        self.assertListEqual(
-            extract_markdown_images(pattern),
-            [
-                ("image", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/zjjcJKZ.png"),
-                ("another", "https://storage.googleapis.com/qvault-webapp-dynamic-assets/course_assets/dfsdkjfd.png")
-            ])
+    def test_extract_markdown_images(self):
+        matches = extract_markdown_images(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches)
 
-    def test_extract_markdown_link(self):
-        pattern = "This is text with a [link](https://www.example.com) and [another](https://www.example.com/another)"
+    def test_extract_markdown_links(self):
+        matches = extract_markdown_links(
+            "This is text with a [link](https://boot.dev) and [another link](https://blog.boot.dev)"
+        )
         self.assertListEqual(
-            extract_markdown_links(pattern),
             [
-                ("link", "https://www.example.com"),
-                ("another", "https://www.example.com/another")
-            ])
+                ("link", "https://boot.dev"),
+                ("another link", "https://blog.boot.dev"),
+            ],
+            matches,
+        )
+
+    def test_split_image(self):
+        node = TextNode(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)",
+            text_type_text,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode("This is text with an ", text_type_text),
+                TextNode("image", text_type_image, "https://i.imgur.com/zjjcJKZ.png"),
+            ],
+            new_nodes,
+        )
+
+    def test_split_image_single(self):
+        node = TextNode(
+            "![image](https://www.example.com/image.png)",
+            text_type_text,
+        )
+        new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode("image", text_type_image, "https://www.example.com/image.png"),
+            ],
+            new_nodes,
+        )
 
     def test_split_images(self):
         node = TextNode(
@@ -158,6 +185,7 @@ class TestInlineMarkdown(unittest.TestCase):
             ],
             nodes,
         )
+
 
 if __name__ == "__main__":
     unittest.main()

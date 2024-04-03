@@ -1,13 +1,20 @@
-from textnode import TextNode
-from inline_markdown import text_to_textnodes
-from htmlnode import HTMLNode
-from blocks_markdown import markdown_to_blocks, block_to_block_type
+import os
+import shutil
 
-with open("/home/bvdepeut/workspace/github.com/bvdepeutte/static_site_generator/src/block_test.txt", "r") as file:
-    content = file.read()
+from copystatic import copy_files_recursive
+
+
+dir_path_static = "./static"
+dir_path_public = "./public"
 
 
 def main():
-    text = block_to_block_type("```Code```")
-    print(text)
+    print("Deleting public directory...")
+    if os.path.exists(dir_path_public):
+        shutil.rmtree(dir_path_public)
+
+    print("Copying static files to public directory...")
+    copy_files_recursive(dir_path_static, dir_path_public)
+
+
 main()
