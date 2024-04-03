@@ -37,4 +37,4 @@ class TextNode:
             return LeafNode("a",text_node.text,text_node.url)
         elif text_node.text_type == text_type_image:
             return LeafNode("img",None,{"src":text_node.url,"alt":text_node.text})
-
+        raise ValueError(f"Invalid text_type: {text_node.text_type}")
